@@ -1,0 +1,73 @@
+<html>
+<head>
+
+<script src="js/jquery-1.7.2.js"></script>
+<script src="js/jquery.tmpl.js"></script>
+<script src='js/knockout-2.1.0.debug.js'></script>
+</head>
+<body>
+	<h2>First KnockOut!</h2>
+	<p>First Name <span data-bind="text: firstName" ></span></p>
+	<p>Last Name <span data-bind="text: lastName" ></span></p>
+	<p>full Name <span data-bind="text: fullName" ></span></p>
+	<input data-bind="value: firstName" />
+	<input data-bind="value: lastName" />
+<h2>My Friends (<span data-bind="text: myViewModel.friends().length"></span>)</h2>
+<button data-bind="click: addFriend, enable: friends().length < 5">Add friend</button>
+<ul data-bind="template:{name:'friendsTemplate', foreach:friends}"></ul>
+<button id="test">test</button>
+<script id="friendsTemplate" type="text/html">
+	<!--template-->
+	<li>
+		<input data-bind='value: name' /> 	
+		<button data-bind="click: remove">Remove</button>
+		<label><input type='checkbox' data-bind='checked: isOnTwitter' />Is on Twitter</label>
+		<input data-bind='value: twitterName, visible: isOnTwitter' />
+	</li>
+</script>
+
+<script type="text/javascript">
+
+    function friend(name) {
+        return {
+            name: ko.observable(name),
+            isOnTwitter: ko.observable(false),
+            twitterName: ko.observable(),
+            remove: function() { myViewModel.friends.remove(this); }
+        };
+    };
+
+    var myViewModel = {
+        firstName: ko.observable("Andrew"),
+        lastName: ko.observable("Chen"),
+        friends: ko.observableArray([new friend("Steve"), new friend("allen"), new friend("ami")]),
+        addFriend: function() {
+            this.friends.push(new friend("another friend"))
+        }
+    };
+    /* //first method to call fullName
+    myViewModel.fullName = ko.dependentObservable(
+    function(){
+    return	this.firstName() +" " + this.lastName();
+    },myViewModel);
+    */
+    myViewModel.fullName = ko.computed(
+            		function() {
+            		    return this.firstName() + " " + this.lastName();
+            		}, myViewModel);
+
+    ko.applyBindings(myViewModel);
+
+    /*
+    function AppViewModel() {
+    this.firstName = "Bert";
+    this.lastName = "Bertington";
+
+    }
+
+    // Activates knockout.js
+    ko.applyBindings(new AppViewModel());
+    */
+</script>
+</body>
+</html>
